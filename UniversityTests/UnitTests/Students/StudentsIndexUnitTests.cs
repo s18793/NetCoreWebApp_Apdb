@@ -90,5 +90,16 @@ namespace UniversityTests.UnitTests.Students
 
             //...
         }
+
+        [Test]
+            public void IndexMethod_NoStudent_Correct()
+        {
+            //...
+        }
+        [Test]
+        public void IndexMethod_StudentsWithGradesAndWithout_Correct()
+        {
+            //...
+        }
     }
 }
