@@ -92,14 +92,71 @@ namespace UniversityTests.UnitTests.Students
         }
 
         [Test]
-            public void IndexMethod_NoStudent_Correct()
+        public void IndexMethod_NoStudent_Correct()
         {
-            //...
+            var dbLayer = new Mock<IStudentsRepository>();
+            dbLayer.Setup(d => d.GetStudents()).Returns(new List<Student>());
+
+
+
+
+            var cont = new StudentsController(dbLayer.Object);
+
+            
+            var result = cont.Index();
+
+            
+            Assert.IsNotNull(result);
+            Assert.IsTrue(result is ViewResult);
+            var vr = (ViewResult)result;
+            Assert.IsNotNull(vr.Model);
+            Assert.IsTrue(vr.Model is IEnumerable<StudentViewModel>);
+            var vm = (IEnumerable<StudentViewModel>)vr.Model;
+            Assert.IsTrue(vm.Count() == 1);
+
+            
+            Assert.IsTrue(vm.ElementAt(0).AverageGrade == 0);
+            Assert.IsTrue(vm.ElementAt(0).EctsSum == 0);
+
+
+
+            
         }
         [Test]
         public void IndexMethod_StudentsWithGradesAndWithout_Correct()
         {
-            //...
+            var dbLayer = new Mock<IStudentsRepository>();
+            dbLayer.Setup(d => d.GetStudents()).Returns(new List<Student>()
+            {
+                new Student{IdStudent=1, FirstName="Andrzej", LastName="Malewski", Address="Warszawa, Kolorowa 12"},
+                new Student{IdStudent=2, FirstName="Andrzej", LastName="Malewski", Address="Warszawa, Kolorowa 12"}
+            });
+            dbLayer.Setup(d => d.GetGrades(1)).Returns(new List<Grade>()
+            {
+                new Grade{IdGrade=1, IdStudent=1, GradeValue=4, Subject="Matematyka dyskretna", SubjectType="Group 1"}
+            });
+
+            var cont = new StudentsController(dbLayer.Object);
+
+
+            var result = cont.Index();
+
+
+            Assert.IsNotNull(result);
+            Assert.IsTrue(result is ViewResult);
+            var vr = (ViewResult)result;
+            Assert.IsNotNull(vr.Model);
+            Assert.IsTrue(vr.Model is IEnumerable<StudentViewModel>);
+            var vm = (IEnumerable<StudentViewModel>)vr.Model;
+            Assert.IsTrue(vm.Count() == 1);
+
+
+            Assert.IsTrue(vm.ElementAt(0).AverageGrade == 4);
+            Assert.IsTrue(vm.ElementAt(0).EctsSum == 5);
+
+            Assert.IsTrue(vm.ElementAt(0).AverageGrade == 0);
+            Assert.IsTrue(vm.ElementAt(0).EctsSum == 0);
+
         }
     }
 }
